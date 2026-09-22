@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const LOGO_SRC = "/kostochka-logo.jpg";
@@ -124,44 +124,22 @@ const outcomes = [
   "Отримаєш систему дій, яку можна повторювати щотижня",
 ];
 
-const packages = [
-  {
-    id: "base",
-    name: "БАЗА",
-    label: "Самостійний",
-    price: "1499 грн",
-    amount: 1499,
-    subtitle:
-      "Ідеально для тих, хто має залізну дисципліну та звик рухатися у своєму темпі.",
-    button: "Обрати тариф «База»",
-    features: [
-      "Доступ до всіх 11 практичних модулів",
-      "Доступ до закритого Telegram-каналу з відеоуроками",
-      "Домашні завдання після кожного уроку для самостійного виконання",
-      "Доступ до матеріалів назавжди",
-    ],
-    recommended: false,
-  },
-  {
-    id: "pro",
-    name: "PRO",
-    label: "З моєю підтримкою",
-    price: "3499 грн",
-    amount: 3499,
-    subtitle:
-      "Для тих, хто хоче максимальний результат, особистий фідбек та сильне оточення.",
-    button: "Обрати тариф «PRO»",
-    features: [
-      "Усі матеріали тарифу «База»",
-      "Особиста перевірка кожної домашки з поясненням помилок",
-      "Закритий чат учасників для розборів, нетворкінгу та підтримки",
-      "Прямий зворотний зв’язок по ідеях, сценаріях і подачі",
-      "Додаткові фішки, інсайди та розбори поза основною програмою",
-      "Підійде, якщо хочеш не просто дивитися уроки, а отримувати правки по своїх відео, ідеях і сценаріях",
-    ],
-    recommended: true,
-  },
-];
+const course = {
+  id: "base",
+  name: "БАЗА",
+  label: "Самостійний",
+  price: "999 грн",
+  amount: 999,
+  subtitle:
+    "Ідеально для тих, хто має залізну дисципліну та звик рухатися у своєму темпі.",
+  button: "Придбати курс",
+  features: [
+    "Доступ до всіх 11 практичних модулів",
+    "Доступ до закритого Telegram-каналу з відеоуроками",
+    "Домашні завдання після кожного уроку для самостійного виконання",
+    "Доступ до матеріалів назавжди",
+  ],
+};
 
 const faqs = [
   {
@@ -182,12 +160,7 @@ const faqs = [
   {
     question: "Де будуть уроки?",
     answer:
-      "Уроки будуть у закритому Telegram-каналі. Після успішної оплати ти отримаєш доступ відповідно до обраного тарифу.",
-  },
-  {
-    question: "Чим відрізняється PRO від БАЗИ?",
-    answer:
-      "У тарифі «База» ти проходиш матеріали самостійно. У тарифі «PRO» отримуєш перевірку домашніх завдань, закритий чат учасників, прямий зворотний зв’язок і додаткові розбори.",
+      "Уроки будуть у закритому Telegram-каналі. Після успішної оплати ти отримаєш доступ до матеріалів курсу.",
   },
   {
     question: "Що робити, якщо виникли проблеми з оплатою або доступом?",
@@ -207,16 +180,10 @@ const seller = {
 export default function CourseLandingSite() {
   const [activePage, setActivePage] = useState(() => getPageFromPath());
   const [menuOpen, setMenuOpen] = useState(false);
-  const [activePackage, setActivePackage] = useState("base");
   const [openFaq, setOpenFaq] = useState(0);
   const [imageErrors, setImageErrors] = useState({ logo: false, photo: false });
   const [formStatus, setFormStatus] = useState({ loading: false, error: "" });
   const [pendingScrollTarget, setPendingScrollTarget] = useState(null);
-
-  const selectedPackage = useMemo(
-    () => packages.find((item) => item.id === activePackage) ?? packages[1],
-    [activePackage]
-  );
 
   useEffect(() => {
     document.title = pageTitles[activePage] ?? pageTitles.about;
@@ -278,11 +245,6 @@ export default function CourseLandingSite() {
     }
   };
 
-  const handlePackageSelect = (packageId) => {
-    setActivePackage(packageId);
-    navigateTo("program", "apply");
-  };
-
   const handleSubmit = async (event) => {
     event.preventDefault();
     setFormStatus({ loading: true, error: "" });
@@ -293,9 +255,9 @@ export default function CourseLandingSite() {
       phone: String(formData.get("phone") || "").trim(),
       telegram: String(formData.get("telegram") || "").trim(),
       email: String(formData.get("email") || "").trim(),
-      packageId: selectedPackage.id,
-      packageName: selectedPackage.name,
-      amount: selectedPackage.amount,
+      packageId: course.id,
+      packageName: course.name,
+      amount: course.amount,
       currency: "UAH",
       source: "kostochka.org",
     };
@@ -332,15 +294,11 @@ export default function CourseLandingSite() {
   };
 
   const sharedProps = {
-    activePackage,
-    selectedPackage,
     openFaq,
     imageErrors,
     formStatus,
-    setActivePackage,
     setOpenFaq,
     setImageErrors,
-    handlePackageSelect,
     handleSubmit,
     navigateTo,
   };
@@ -549,15 +507,11 @@ function AboutPage({ imageErrors, setImageErrors, navigateTo }) {
 }
 
 function ProgramPage({
-  activePackage,
-  selectedPackage,
   openFaq,
   imageErrors,
   formStatus,
-  setActivePackage,
   setOpenFaq,
   setImageErrors,
-  handlePackageSelect,
   handleSubmit,
   navigateTo,
 }) {
@@ -589,7 +543,7 @@ function ProgramPage({
               href="#price"
               className="group inline-flex items-center justify-center gap-2 rounded-2xl bg-white px-6 py-4 font-bold text-black transition hover:bg-zinc-200"
             >
-              Обрати тариф <Icon name="arrowRight" className="transition group-hover:translate-x-1" size={18} />
+              Придбати курс <Icon name="arrowRight" className="transition group-hover:translate-x-1" size={18} />
             </a>
             <a
               href="#program"
@@ -690,14 +644,14 @@ function ProgramPage({
 
                 <div className="mt-5 grid grid-cols-3 gap-3 text-center">
                   <PhoneMetric value="11" label="модулів" />
-                  <PhoneMetric value="2" label="тарифи" />
+                  <PhoneMetric value="999 ₴" label="вартість" />
                   <PhoneMetric value="∞" label="доступ" />
                 </div>
 
                 <div className="mt-5 rounded-2xl border border-white/10 bg-white/[0.04] p-4">
                   <p className="text-sm font-semibold">Шлях учасника</p>
                   <div className="mt-3 grid gap-2 text-sm text-zinc-400">
-                    <CheckLine text="Обирає тариф" />
+                    <CheckLine text="Обирає курс" />
                     <CheckLine text="Заповнює дані" />
                     <CheckLine text="Оплачує через WayForPay" />
                     <CheckLine text="Отримує Telegram-доступ" />
@@ -765,80 +719,33 @@ function ProgramPage({
         </div>
       </section>
 
-      <section id="price" className="mx-auto max-w-7xl px-5 py-20 lg:px-8">
-        <div className="mb-10 flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
-          <div>
-            <p className="text-sm font-bold uppercase tracking-[0.28em] text-zinc-500">Тарифи</p>
-            <h2 className="mt-3 text-4xl font-black tracking-tight md:text-5xl">Обери свій формат навчання.</h2>
+      <section id="price" className="mx-auto max-w-7xl px-5 py-16 sm:py-20 lg:px-8">
+        <div className="mx-auto max-w-3xl">
+          <div className="mb-8 text-center">
+            <p className="text-sm font-bold uppercase tracking-[0.28em] text-zinc-500">Вартість курсу</p>
+            <h2 className="mt-3 text-4xl font-black tracking-tight md:text-5xl">Почни навчання сьогодні.</h2>
           </div>
-        </div>
-
-        <div className="grid gap-5 lg:grid-cols-2">
-          {packages.map((pack) => {
-            const isActive = activePackage === pack.id;
-
-            return (
-              <button
-                key={pack.id}
-                type="button"
-                onClick={() => handlePackageSelect(pack.id)}
-                className={`rounded-[1.7rem] border p-6 text-left transition ${
-                  isActive
-                    ? "border-white bg-white text-black shadow-2xl shadow-white/10"
-                    : pack.recommended
-                    ? "border-white/35 bg-white/[0.08] text-white hover:border-white/55 hover:bg-white/[0.11]"
-                    : "border-white/10 bg-white/[0.04] text-white hover:border-white/25 hover:bg-white/[0.07]"
-                }`}
-              >
-                <div className="flex h-full flex-col">
-                  <div className="flex min-h-[2rem] items-start justify-between gap-4">
-                    <p className="text-sm font-black uppercase tracking-[0.22em] text-zinc-500">
-                      {pack.label}
-                    </p>
-
-                    <div className="flex shrink-0 items-center gap-2">
-                      {pack.recommended && (
-                        <span className={`rounded-full px-3 py-1 text-xs font-black uppercase tracking-wide ${isActive ? "bg-black text-white" : "bg-white text-black"}`}>
-                          рекомендовано
-                        </span>
-                      )}
-
-                      {isActive && (
-                        <span className="rounded-full bg-zinc-900 px-3 py-1 text-xs font-black uppercase tracking-wide text-white">
-                          обрано
-                        </span>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="mt-5">
-                    <p className="text-4xl font-black">{pack.name}</p>
-                    <p className={`mt-3 min-h-[3rem] text-sm leading-6 ${isActive ? "text-zinc-600" : "text-zinc-400"}`}>
-                      {pack.subtitle}
-                    </p>
-                  </div>
-
-                  <p className="mt-7 text-5xl font-black tracking-tight">{pack.price}</p>
-
-                  <div className="mt-6 grid gap-3">
-                    {pack.features.map((feature) => (
-                      <div
-                        key={feature}
-                        className={`flex gap-3 text-sm leading-6 ${isActive ? "text-zinc-700" : "text-zinc-300"}`}
-                      >
-                        <Icon name="check" size={17} className="mt-1 shrink-0" />
-                        {feature}
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className={`mt-7 inline-flex w-fit items-center justify-center gap-2 rounded-2xl px-5 py-3 text-sm font-black ${isActive ? "bg-black text-white" : "bg-white text-black"}`}>
-                    {pack.button} <Icon name="arrowRight" size={16} />
-                  </div>
+          <div className="rounded-[1.7rem] border border-white bg-white p-6 text-black shadow-2xl shadow-white/10 sm:p-8">
+            <p className="text-sm font-black uppercase tracking-[0.22em] text-zinc-500">{course.label}</p>
+            <h3 className="mt-4 text-3xl font-black sm:text-4xl">{course.name}</h3>
+            <p className="mt-3 max-w-xl text-sm leading-6 text-zinc-600">{course.subtitle}</p>
+            <p className="mt-6 text-5xl font-black tracking-tight sm:text-6xl">{course.price}</p>
+            <div className="mt-6 grid gap-3 sm:grid-cols-2 sm:gap-x-6">
+              {course.features.map((feature) => (
+                <div key={feature} className="flex gap-3 text-sm leading-6 text-zinc-700">
+                  <Icon name="check" size={17} className="mt-1 shrink-0" />
+                  <span>{feature}</span>
                 </div>
-              </button>
-            );
-          })}
+              ))}
+            </div>
+            <button
+              type="button"
+              onClick={() => navigateTo("program", "apply")}
+              className="mt-8 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-black px-5 py-4 text-sm font-black text-white transition hover:bg-zinc-800 sm:w-auto"
+            >
+              {course.button} <Icon name="arrowRight" size={16} />
+            </button>
+          </div>
         </div>
       </section>
 
@@ -873,10 +780,10 @@ function ProgramPage({
 
       <section id="apply" className="mx-auto max-w-7xl px-5 py-20 pb-32 lg:px-8">
         <div className="mb-5 grid gap-4 rounded-[2rem] border border-white/10 bg-white/[0.04] p-5 text-zinc-300 md:grid-cols-4 md:p-6">
-          <AfterPaymentStep number="01" title="Залишаєш дані" text="Обираєш тариф і заповнюєш коротку форму." />
+          <AfterPaymentStep number="01" title="Залишаєш дані" text="Заповнюєш коротку форму для запису на курс." />
           <AfterPaymentStep number="02" title="Оплачуєш" text="Переходиш до безпечної оплати через WayForPay." />
           <AfterPaymentStep number="03" title="Артем отримує заявку" text="Після підтвердження оплати заявка потрапляє до списку покупців." />
-          <AfterPaymentStep number="04" title="Отримуєш доступ" text="Посилання з доступом до Telegram-каналу надсилається автоматично відповідно до тарифу." />
+          <AfterPaymentStep number="04" title="Отримуєш доступ" text="Посилання з доступом до Telegram-каналу надсилається автоматично." />
         </div>
 
         <div className="rounded-[2.2rem] border border-white/10 bg-white p-7 text-black md:p-10">
@@ -885,11 +792,11 @@ function ProgramPage({
               <p className="text-sm font-black uppercase tracking-[0.28em] text-zinc-500">Запис на курс</p>
               <h2 className="mt-3 text-4xl font-black tracking-tight md:text-5xl">Залиш дані — і переходь до оплати.</h2>
               <p className="mt-5 max-w-2xl leading-8 text-zinc-700">
-                Після оплати посилання з доступом до Telegram-каналу надішлеться автоматично відповідно до обраного тарифу.
+                Після оплати посилання з доступом до Telegram-каналу надішлеться автоматично.
               </p>
               <div className="mt-7 flex flex-wrap gap-3 text-sm text-zinc-600">
                 <Badge icon={<Icon name="clock" size={16} />} text="Доступ після оплати" />
-                <Badge icon={<Icon name="star" size={16} />} text="БАЗА або PRO" />
+                <Badge icon={<Icon name="star" size={16} />} text="11 модулів" />
                 <Badge icon={<Icon name="message" size={16} />} text="Закритий Telegram" />
               </div>
               <div className="mt-7 text-sm leading-7 text-zinc-600">
@@ -930,19 +837,6 @@ function ProgramPage({
                   autoComplete="email"
                   required
                 />
-                <select
-                  name="tariff"
-                  className="rounded-2xl border border-zinc-200 bg-white px-4 py-4 text-sm outline-none transition focus:border-zinc-500"
-                  value={activePackage}
-                  onChange={(event) => setActivePackage(event.target.value)}
-                >
-                  {packages.map((pack) => (
-                    <option key={pack.id} value={pack.id}>
-                      {pack.name} — {pack.price}
-                    </option>
-                  ))}
-                </select>
-
                 <label className="flex gap-3 px-1 text-xs leading-5 text-zinc-500">
                   <input type="checkbox" required className="mt-1 h-4 w-4 shrink-0 accent-black" />
                   <span>
@@ -978,7 +872,7 @@ function ProgramPage({
                 </button>
 
                 <p className="px-1 text-xs leading-5 text-zinc-500">
-                  Обраний тариф: <span className="font-black text-black">{selectedPackage.name}</span>, сума до оплати: <span className="font-black text-black">{selectedPackage.price}</span>.
+                  Сума до оплати: <span className="font-black text-black">{course.price}</span>.
                 </p>
               </div>
             </form>
@@ -1030,7 +924,7 @@ function OfferPage() {
         <p>
           2.1. Виконавець зобов’язується надати Замовнику інформаційні послуги у вигляді доступу до авторських навчальних матеріалів (відеоуроки, текстові матеріали, закриті спільноти тощо), а Замовник зобов’язується оплатити ці послуги.
         </p>
-        <p>2.2. Назва, зміст та вартість конкретного курсу (тарифу) вказуються на сайті в момент замовлення.</p>
+        <p>2.2. Назва, зміст та вартість курсу вказуються на сайті в момент замовлення.</p>
       </LegalSection>
 
       <LegalSection title="3. Порядок надання послуг">
@@ -1119,7 +1013,7 @@ function PrivacyPage() {
     >
       <LegalSection title="1. Які дані збираються">
         <p>
-          Під час оформлення заявки на курс сайт може збирати такі контактні дані: ім’я, номер телефону, Telegram username, адресу електронної пошти, обраний тариф, дату та статус заявки або оплати.
+          Під час оформлення заявки на курс сайт може збирати такі контактні дані: ім’я, номер телефону, Telegram username, адресу електронної пошти, назву курсу, дату та статус заявки або оплати.
         </p>
       </LegalSection>
 
@@ -1197,7 +1091,7 @@ function PaymentStatusPage({ type, title, text, actionLabel, onAction }) {
           </div>
           <div>
             <p className="font-black text-black">3. Доступ</p>
-            <p className="mt-1">Покупець отримує посилання з доступом відповідно до тарифу.</p>
+            <p className="mt-1">Покупець отримує посилання з доступом до курсу.</p>
           </div>
         </div>
         <button
@@ -1220,7 +1114,7 @@ function PaymentSuccessPage({ navigateTo }) {
     <PaymentStatusPage
       type="success"
       title="Оплату прийнято."
-      text="Ми отримали вашу заявку. Посилання з доступом до Telegram-каналу буде надіслано автоматично відповідно до обраного тарифу."
+      text="Ми отримали вашу заявку. Посилання з доступом до Telegram-каналу буде надіслано автоматично до курсу."
       actionLabel="Повернутися до програми"
       onAction={() => navigateTo("program")}
     />
@@ -1269,7 +1163,7 @@ function MobileStickyCta({ navigateTo }) {
         onClick={() => navigateTo("program", "price")}
         className="flex w-full items-center justify-center gap-2 rounded-2xl bg-white px-5 py-3 text-sm font-black text-black shadow-2xl shadow-black/40"
       >
-        Придбати — від 1499 грн <Icon name="arrowRight" size={16} />
+        Придбати — 999 грн <Icon name="arrowRight" size={16} />
       </button>
     </div>
   );
