@@ -4,13 +4,8 @@ import { appendOrder } from "./shared/sheets.js";
 const TARIFFS = {
   base: {
     name: "БАЗА",
-    amount: 1499,
+    amount: 999,
     productName: "ТІКТОК НА МІЛЬЙОН — тариф БАЗА",
-  },
-  pro: {
-    name: "PRO",
-    amount: 3499,
-    productName: "ТІКТОК НА МІЛЬЙОН — тариф PRO",
   },
 };
 
